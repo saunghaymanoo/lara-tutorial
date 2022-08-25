@@ -1,5 +1,5 @@
 @extends('layouts.app')
-
+@section('title','Login')
 @section('content')
 <div class="container">
     <div class="col-left">
@@ -13,15 +13,18 @@
     <div class="col-right">
         <div class="login-form">
             <h2>Login</h2>
-            @if(session('msg'))
-            <div class="alert alert-info">{{ session('msg') }}</div>
+
+            @if ($errors->any())
+            @foreach ($errors->all() as $error)
+            <div class="alert alert-info">{{ $error }}</div>
+            @endforeach
             @endif
 
             {!! Form::open(['url' => 'login','method'=> 'POST','class' => 'form-control']) !!}
             <p>
                 <label>Username <span>*</span></label>
-                <input type="text" name="username" placeholder="Username or Email" required
-                    value="{{ old('username') }}">
+                <input type="text" name="username" placeholder="Username or Email" value="{{ old('username') }}"
+                    required>
             </p>
             <p>
                 <label>Password<span>*</span></label>

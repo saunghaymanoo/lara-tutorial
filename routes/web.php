@@ -16,15 +16,23 @@ use App\Http\Controllers\Admin\AdminController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [AuthController::class, 'index']);
 Route::get('/login', [AuthController::class, 'getLoginForm']);
 Route::post('/login', [AuthController::class, 'getPostLogin']);
 Route::get('/logout', [AuthController::class, 'getLogout']);
 Route::group(['prefix' => 'admin','middleware' => ['admin:Administrator']], function () {
     Route::get('/home', [AdminController::class, 'index']);
+    Route::get('/student/delete/{id}', [AdminController::class, 'delete']);
+    Route::get('/student/edit/{id}', [AdminController::class, 'edit']);
+    Route::post('/student/update', [AdminController::class, 'update']);
+    Route::get('/student/download', [AdminController::class, 'download']);
+    Route::post('/search', [AdminController::class, 'search']);
+    Route::get('/parent', [AdminController::class, 'getParents']);
 });
 Route::group(['prefix' => 'manager','middleware' => ['manager:Administrator']], function () {
     Route::get('/home', [ManagerController::class, 'index']);
 });
+
+// Route::get('/pass', function () {
+//     dd(bcrypt('admin'));
+// });

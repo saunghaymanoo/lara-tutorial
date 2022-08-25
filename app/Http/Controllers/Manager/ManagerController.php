@@ -9,6 +9,6 @@ class ManagerController extends Controller
 {
     public function index()
     {
-        echo "Hihi";
+        echo "Manager";
     }
 }

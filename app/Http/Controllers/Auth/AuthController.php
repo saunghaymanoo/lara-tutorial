@@ -8,7 +8,7 @@ use Auth;
 use Redirect;
 use Session;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\Auth\LoginUserRequest;
 
 class AuthController extends Controller
 {
@@ -17,6 +17,18 @@ class AuthController extends Controller
     public function __construct()
     {
         $this->middleware('guest', ['except' => 'logout']);
+    }
+    public function index()
+    {
+        if (Auth::guard('Administrator')->check()) {
+            $role = Auth::guard('Administrator')->user()->role;
+            if ($role == 1) {
+                return redirect('admin/home');
+            } elseif ($role == 2) {
+                return redirect('manager/home');
+            }
+        }
+        return redirect('login');
     }
     public function getLogout()
     {
@@ -36,8 +48,9 @@ class AuthController extends Controller
         }
         return view('auth.login');
     }
-    public function getPostLogin(StoreUserRequest $request)
+    public function getPostLogin(LoginUserRequest $request) //Using Infrastructure Request
     {
+        $validated = $request->validated();
         $validation = Auth::guard('Administrator')->attempt([
             'name'=>$request->username,
             'password'=>$request->password,
@@ -52,7 +65,7 @@ class AuthController extends Controller
                 return redirect('login');
             }
         } else {
-            return Redirect::back()->with(['msg' => 'Wrong Credential'])->withInput();
+            return Redirect::back()->withErrors(['msg' => 'Wrong Credential'])->withInput();
         }
     }
 }
