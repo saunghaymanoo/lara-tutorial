@@ -8,9 +8,22 @@ use JWTAuth;
 use App\Models\User;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Support\Facades\Validator;
+use App\Repositories\Api\ApiRepositoryInterface;
+use App\Http\Resources\Student\StudentCollection;
+use App\Http\Resources\Student\StudentResource;
+use App\Http\Resources\Parent\ParentCollection;
+use App\Http\Resources\Parent\ParentResource;
+use App\Utility;
+use DB;
 
 class ApiController extends Controller
 {
+    protected $apiRepository;
+    public function __construct(ApiRepositoryInterface $apiRepository)
+    {
+        DB::connection()->enableQueryLog();
+        $this->apiRepository = $apiRepository;
+    }
     public function authenticate(Request $request)
     {
         $credentials = $request->only('name', 'password');
@@ -51,10 +64,34 @@ class ApiController extends Controller
     }
     public function getStudent(Request $request)
     {
-        dd("hihi");
+        $students   = $this->apiRepository->getAllStudents();
+        return new StudentCollection($students);
+    }
+    public function getStudentById(Request $request)
+    {
+        $id     = $request->get('id');
+        $student = $this->apiRepository->getStudentById($id);
+        return new StudentResource($student);
     }
     public function getManager(Request $request)
     {
         dd("aaa");
+    }
+    public function getAllParents()
+    {
+        try {
+            $parents   = $this->apiRepository->getAllParents();
+            $logMessage 		= " Fetch Student All";
+            Utility::customLog($logMessage);
+            return new ParentCollection($parents);
+        } catch (Exception $e) {
+            Utility::customErrorLog($e->getMessage());
+        }
+    }
+    public function getParentById(Request $request)
+    {
+        $id     = $request->get('id');
+        $parent = $this->apiRepository->getParentById($id);
+        return new ParentResource($parent);
     }
 }
